@@ -1,0 +1,8 @@
+{
+  "name": "Podologia App",
+  "short_name": "Podologia",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#14b8a6"
+}
