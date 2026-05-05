@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Podologia App</title>
+<title>Thais Podologia</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#14b8a6">
@@ -19,17 +19,53 @@ input,textarea{width:100%;padding:8px;margin:5px 0;border-radius:6px;border:1px 
 </head>
 <body>
 
-<h1>📱 Podologia App</h1>
+<h1>👋 Thais Podologia</h1>
 
 <div class="card">
-<button onclick="abrirForm()">➕ Adicionar paciente</button>
+<h3>📅 Agenda</h3>
+<input type="date" id="data">
+<input type="time" id="hora">
+<input id="cliente" placeholder="Nome do cliente">
+<button onclick="agendar()">Agendar</button>
+<div id="agendaLista"></div>
+</div>
+
+<div class="card">
+<button onclick="abrirForm()">➕ Novo paciente</button>
 </div>
 
 <div id="form" class="card hidden">
+<h3>Ficha de Anamnese</h3>
+
 <input id="nome" placeholder="Nome">
 <input id="contato" placeholder="Contato">
-<textarea id="queixa" placeholder="Queixa"></textarea>
+<input id="idade" placeholder="Idade">
 
+<textarea id="queixa" placeholder="Queixa principal"></textarea>
+<textarea id="tratamento" placeholder="Tratamento anterior"></textarea>
+
+<input id="calcado" placeholder="Calçado">
+<input id="numero" placeholder="Número">
+<input id="meia" placeholder="Tipo de meia">
+
+<input id="peso" placeholder="Peso">
+<input id="altura" placeholder="Altura">
+
+<input id="esporte" placeholder="Esporte">
+<input id="cirurgia" placeholder="Cirurgia">
+
+<input id="dor" placeholder="Sensibilidade à dor">
+<input id="agua" placeholder="Água por dia">
+
+<textarea id="condicoes" placeholder="Condições de saúde"></textarea>
+<textarea id="alergias" placeholder="Alergias"></textarea>
+
+<p><b>Foto do paciente</b></p>
+<input type="file" id="foto" accept="image/*" capture="environment">
+
+<label><input type="checkbox" id="fotos"> Autoriza fotos</label>
+
+<br><br>
 <button onclick="salvar()">Salvar</button>
 <button onclick="fecharForm()">Cancelar</button>
 </div>
@@ -38,33 +74,153 @@ input,textarea{width:100%;padding:8px;margin:5px 0;border-radius:6px;border:1px 
 <div id="lista"></div>
 
 <script>
+
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
+navigator.serviceWorker.register('service-worker.js');
 }
 
-let pacientes = JSON.parse(localStorage.getItem("pacientes")||"[]");
+let pacientes = JSON.parse(localStorage.getItem("pacientes") || "[]");
 
 function atualizar(){
-let lista=document.getElementById("lista");
-lista.innerHTML="";
-pacientes.forEach(p=>{
-lista.innerHTML+=`<div class='card'><b>${p.nome}</b><br>${p.contato}</div>`;
+let lista = document.getElementById("lista");
+lista.innerHTML = "";
+
+pacientes.forEach(p => {
+lista.innerHTML += `
+<div class='card'>
+<b>${p.nome}</b><br>
+${p.contato}<br>
+${p.queixa}<br>
+${p.foto ? <img src="${p.foto}" style="width:100%;border-radius:8px;margin-top:5px;"> : ""}
+</div>`;
 });
 }
 
-function abrirForm(){form.classList.remove("hidden")}
-function fecharForm(){form.classList.add("hidden")}
+function abrirForm(){
+document.getElementById("form").classList.remove("hidden");
+}
+
+function fecharForm(){
+document.getElementById("form").classList.add("hidden");
+}
 
 function salvar(){
-let p={nome:nome.value,contato:contato.value,queixa:queixa.value,data:new Date()};
-if(!p.nome){alert("Preencha o nome");return;}
+
+let nome = document.getElementById("nome").value;
+let contato = document.getElementById("contato").value;
+let idade = document.getElementById("idade").value;
+let queixa = document.getElementById("queixa").value;
+let tratamento = document.getElementById("tratamento").value;
+let calcado = document.getElementById("calcado").value;
+let numero = document.getElementById("numero").value;
+let meia = document.getElementById("meia").value;
+let peso = document.getElementById("peso").value;
+let altura = document.getElementById("altura").value;
+let esporte = document.getElementById("esporte").value;
+let cirurgia = document.getElementById("cirurgia").value;
+let dor = document.getElementById("dor").value;
+let agua = document.getElementById("agua").value;
+let condicoes = document.getElementById("condicoes").value;
+let alergias = document.getElementById("alergias").value;
+let fotos = document.getElementById("fotos").checked;
+let fotoInput = document.getElementById("foto");
+
+if(!nome){
+alert("Preencha o nome");
+return;
+}
+
+let file = fotoInput.files[0];
+
+if(file){
+let reader = new FileReader();
+
+reader.onload = function(e){
+salvarPaciente(e.target.result);
+}
+
+reader.readAsDataURL(file);
+
+}else{
+salvarPaciente(null);
+}
+
+function salvarPaciente(fotoBase64){
+let p = {
+nome, contato, idade, queixa, tratamento,
+calcado, numero, meia, peso, altura,
+esporte, cirurgia, dor, agua,
+condicoes, alergias, fotos,
+foto: fotoBase64,
+data: new Date()
+};
+
 pacientes.unshift(p);
-localStorage.setItem("pacientes",JSON.stringify(pacientes));
+localStorage.setItem("pacientes", JSON.stringify(pacientes));
+
 fecharForm();
 atualizar();
 }
 
+}
+
+let agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
+
+function agendar(){
+
+let d = document.getElementById("data").value;
+let h = document.getElementById("hora").value;
+let c = document.getElementById("cliente").value;
+
+if(!d || !h || !c){
+alert("Preencha tudo");
+return;
+}
+
+let dia = new Date(d).getDay();
+let horaNum = parseInt(h.split(":")[0]);
+
+if(dia === 0){
+alert("Domingo não trabalha");
+return;
+}
+
+if(dia >= 1 && dia <= 5){
+if(horaNum < 13 || horaNum > 19){
+alert("Seg a Sex: 13h às 20h");
+return;
+}
+}
+
+if(dia === 6){
+if(horaNum < 10 || horaNum > 17){
+alert("Sábado: 10h às 18h");
+return;
+}
+}
+
+agenda.push({data:d, hora:h, cliente:c});
+localStorage.setItem("agenda", JSON.stringify(agenda));
+
+mostrarAgenda();
+}
+
+function mostrarAgenda(){
+let div = document.getElementById("agendaLista");
+div.innerHTML = "";
+
+agenda.forEach(a => {
+div.innerHTML += `
+<div class='card'>
+📅 ${a.data} - ⏰ ${a.hora}<br>
+👤 ${a.cliente}
+</div>`;
+});
+}
+
+mostrarAgenda();
 atualizar();
+
 </script>
 
 </body>
