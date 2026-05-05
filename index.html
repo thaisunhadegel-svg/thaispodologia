@@ -1,227 +1,179 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thais Podologia</title>
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#14b8a6">
+<title>Agenda Podologia</title>
 
 <style>
-body{font-family:Arial;background:#f5f5f5;margin:0;padding:15px}
-.card{background:#fff;border-radius:12px;padding:15px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
-button{padding:10px;border:none;border-radius:8px;background:#14b8a6;color:#fff}
-input,textarea{width:100%;padding:8px;margin:5px 0;border-radius:6px;border:1px solid #ccc}
-.hidden{display:none}
+body {
+    font-family: Arial;
+    background: #f4f6f8;
+    margin: 20px;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+h2 {
+    margin-top: 20px;
+}
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px;
+}
+button {
+    background: #2d89ef;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+.card {
+    background: #eef3f7;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
 </style>
 
 </head>
+
 <body>
 
-<h1>👋 Thais Podologia</h1>
+<div class="container">
 
-<div class="card">
-<h3>📅 Agenda</h3>
-<input type="date" id="data">
-<input type="time" id="hora">
-<input id="cliente" placeholder="Nome do cliente">
-<button onclick="agendar()">Agendar</button>
-<div id="agendaLista"></div>
-</div>
+<h1>📅 Agendamento + Anamnese Podologia</h1>
 
-<div class="card">
-<button onclick="abrirForm()">➕ Novo paciente</button>
-</div>
-
-<div id="form" class="card hidden">
-<h3>Ficha de Anamnese</h3>
-
+<h2>Dados do Paciente</h2>
 <input id="nome" placeholder="Nome">
 <input id="contato" placeholder="Contato">
 <input id="idade" placeholder="Idade">
 
+<h2>Agendamento</h2>
+<input type="date" id="data">
+<input type="time" id="hora">
+
+<h2>Anamnese</h2>
+
 <textarea id="queixa" placeholder="Queixa principal"></textarea>
 <textarea id="tratamento" placeholder="Tratamento anterior"></textarea>
 
-<input id="calcado" placeholder="Calçado">
-<input id="numero" placeholder="Número">
-<input id="meia" placeholder="Tipo de meia">
+<select id="calcado">
+<option>Aberto</option>
+<option>Fechado</option>
+</select>
+
+<input id="numero" placeholder="Número do calçado">
+
+<select id="meia">
+<option>Não usa</option>
+<option>Esportiva</option>
+<option>Social</option>
+</select>
 
 <input id="peso" placeholder="Peso">
 <input id="altura" placeholder="Altura">
 
-<input id="esporte" placeholder="Esporte">
-<input id="cirurgia" placeholder="Cirurgia">
+<input id="esporte" placeholder="Pratica esportes?">
 
-<input id="dor" placeholder="Sensibilidade à dor">
-<input id="agua" placeholder="Água por dia">
+<input id="cirurgia" placeholder="Cirurgias anteriores">
 
-<textarea id="condicoes" placeholder="Condições de saúde"></textarea>
-<textarea id="alergias" placeholder="Alergias"></textarea>
+<select id="dor">
+<option>Nenhuma</option>
+<option>Pouca</option>
+<option>Suportável</option>
+<option>Muita</option>
+</select>
 
-<p><b>Foto do paciente</b></p>
-<input type="file" id="foto" accept="image/*" capture="environment">
+<input id="agua" placeholder="Ingestão de água">
 
-<label><input type="checkbox" id="fotos"> Autoriza fotos</label>
+<h3>Condições de saúde</h3>
+<label><input type="checkbox" id="diabetes"> Diabetes</label><br>
+<label><input type="checkbox" id="pressao"> Pressão alta</label><br>
+<label><input type="checkbox" id="circulatorio"> Problema circulatório</label><br>
+<input id="outras" placeholder="Outras condições">
 
-<br><br>
-<button onclick="salvar()">Salvar</button>
-<button onclick="fecharForm()">Cancelar</button>
-</div>
+<input id="alergia" placeholder="Alergias">
 
-<h3>Pacientes</h3>
+<select id="fotos">
+<option>Sim</option>
+<option>Não</option>
+</select>
+
+<h2>Anotações</h2>
+<textarea id="anotacoes"></textarea>
+
+<button onclick="salvar()">Salvar Paciente</button>
+
+<h2>Pacientes cadastrados</h2>
 <div id="lista"></div>
+
+</div>
 
 <script>
 
-if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('service-worker.js');
+let pacientes = JSON.parse(localStorage.getItem("pacientes")) || [];
+
+function salvar() {
+
+    let paciente = {
+        nome: nome.value,
+        contato: contato.value,
+        idade: idade.value,
+        data: data.value,
+        hora: hora.value,
+        queixa: queixa.value,
+        tratamento: tratamento.value,
+        calcado: calcado.value,
+        numero: numero.value,
+        meia: meia.value,
+        peso: peso.value,
+        altura: altura.value,
+        esporte: esporte.value,
+        cirurgia: cirurgia.value,
+        dor: dor.value,
+        agua: agua.value,
+        diabetes: diabetes.checked,
+        pressao: pressao.checked,
+        circulatorio: circulatorio.checked,
+        outras: outras.value,
+        alergia: alergia.value,
+        fotos: fotos.value,
+        anotacoes: anotacoes.value
+    };
+
+    pacientes.push(paciente);
+    localStorage.setItem("pacientes", JSON.stringify(pacientes));
+
+    alert("Salvo com sucesso!");
+    mostrar();
 }
 
-let pacientes = JSON.parse(localStorage.getItem("pacientes") || "[]");
+function mostrar() {
+    let lista = document.getElementById("lista");
+    lista.innerHTML = "";
 
-function atualizar(){
-let lista = document.getElementById("lista");
-lista.innerHTML = "";
-
-pacientes.forEach(p => {
-lista.innerHTML += `
-<div class='card'>
-<b>${p.nome}</b><br>
-${p.contato}<br>
-${p.queixa}<br>
-${p.foto ? <img src="${p.foto}" style="width:100%;border-radius:8px;margin-top:5px;"> : ""}
-</div>`;
-});
+    pacientes.forEach((p, i) => {
+        lista.innerHTML += `
+        <div class="card">
+            <b>${p.nome}</b><br>
+            📅 ${p.data} às ${p.hora}<br>
+            📞 ${p.contato}<br>
+            Queixa: ${p.queixa}<br>
+            Anotações: ${p.anotacoes}
+        </div>
+        `;
+    });
 }
 
-function abrirForm(){
-document.getElementById("form").classList.remove("hidden");
-}
-
-function fecharForm(){
-document.getElementById("form").classList.add("hidden");
-}
-
-function salvar(){
-
-let nome = document.getElementById("nome").value;
-let contato = document.getElementById("contato").value;
-let idade = document.getElementById("idade").value;
-let queixa = document.getElementById("queixa").value;
-let tratamento = document.getElementById("tratamento").value;
-let calcado = document.getElementById("calcado").value;
-let numero = document.getElementById("numero").value;
-let meia = document.getElementById("meia").value;
-let peso = document.getElementById("peso").value;
-let altura = document.getElementById("altura").value;
-let esporte = document.getElementById("esporte").value;
-let cirurgia = document.getElementById("cirurgia").value;
-let dor = document.getElementById("dor").value;
-let agua = document.getElementById("agua").value;
-let condicoes = document.getElementById("condicoes").value;
-let alergias = document.getElementById("alergias").value;
-let fotos = document.getElementById("fotos").checked;
-let fotoInput = document.getElementById("foto");
-
-if(!nome){
-alert("Preencha o nome");
-return;
-}
-
-let file = fotoInput.files[0];
-
-if(file){
-let reader = new FileReader();
-
-reader.onload = function(e){
-salvarPaciente(e.target.result);
-}
-
-reader.readAsDataURL(file);
-
-}else{
-salvarPaciente(null);
-}
-
-function salvarPaciente(fotoBase64){
-let p = {
-nome, contato, idade, queixa, tratamento,
-calcado, numero, meia, peso, altura,
-esporte, cirurgia, dor, agua,
-condicoes, alergias, fotos,
-foto: fotoBase64,
-data: new Date()
-};
-
-pacientes.unshift(p);
-localStorage.setItem("pacientes", JSON.stringify(pacientes));
-
-fecharForm();
-atualizar();
-}
-
-}
-
-let agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
-
-function agendar(){
-
-let d = document.getElementById("data").value;
-let h = document.getElementById("hora").value;
-let c = document.getElementById("cliente").value;
-
-if(!d || !h || !c){
-alert("Preencha tudo");
-return;
-}
-
-let dia = new Date(d).getDay();
-let horaNum = parseInt(h.split(":")[0]);
-
-if(dia === 0){
-alert("Domingo não trabalha");
-return;
-}
-
-if(dia >= 1 && dia <= 5){
-if(horaNum < 13 || horaNum > 19){
-alert("Seg a Sex: 13h às 20h");
-return;
-}
-}
-
-if(dia === 6){
-if(horaNum < 10 || horaNum > 17){
-alert("Sábado: 10h às 18h");
-return;
-}
-}
-
-agenda.push({data:d, hora:h, cliente:c});
-localStorage.setItem("agenda", JSON.stringify(agenda));
-
-mostrarAgenda();
-}
-
-function mostrarAgenda(){
-let div = document.getElementById("agendaLista");
-div.innerHTML = "";
-
-agenda.forEach(a => {
-div.innerHTML += `
-<div class='card'>
-📅 ${a.data} - ⏰ ${a.hora}<br>
-👤 ${a.cliente}
-</div>`;
-});
-}
-
-mostrarAgenda();
-atualizar();
+mostrar();
 
 </script>
 
 </body>
 </html>
+
