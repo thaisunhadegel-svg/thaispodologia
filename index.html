@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podologia App</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14b8a6">
+
+<style>
+body{font-family:Arial;background:#f5f5f5;margin:0;padding:15px}
+.card{background:#fff;border-radius:12px;padding:15px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+button{padding:10px;border:none;border-radius:8px;background:#14b8a6;color:#fff}
+input,textarea{width:100%;padding:8px;margin:5px 0;border-radius:6px;border:1px solid #ccc}
+.hidden{display:none}
+</style>
+
+</head>
+<body>
+
+<h1>📱 Podologia App</h1>
+
+<div class="card">
+<button onclick="abrirForm()">➕ Adicionar paciente</button>
+</div>
+
+<div id="form" class="card hidden">
+<input id="nome" placeholder="Nome">
+<input id="contato" placeholder="Contato">
+<textarea id="queixa" placeholder="Queixa"></textarea>
+
+<button onclick="salvar()">Salvar</button>
+<button onclick="fecharForm()">Cancelar</button>
+</div>
+
+<h3>Pacientes</h3>
+<div id="lista"></div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+
+let pacientes = JSON.parse(localStorage.getItem("pacientes")||"[]");
+
+function atualizar(){
+let lista=document.getElementById("lista");
+lista.innerHTML="";
+pacientes.forEach(p=>{
+lista.innerHTML+=`<div class='card'><b>${p.nome}</b><br>${p.contato}</div>`;
+});
+}
+
+function abrirForm(){form.classList.remove("hidden")}
+function fecharForm(){form.classList.add("hidden")}
+
+function salvar(){
+let p={nome:nome.value,contato:contato.value,queixa:queixa.value,data:new Date()};
+if(!p.nome){alert("Preencha o nome");return;}
+pacientes.unshift(p);
+localStorage.setItem("pacientes",JSON.stringify(pacientes));
+fecharForm();
+atualizar();
+}
+
+atualizar();
+</script>
+
+</body>
+</html>
